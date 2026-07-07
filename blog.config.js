@@ -10,7 +10,7 @@ module.exports = {
   description: 'A blog powered by Notion + Next.js',
   author: 'Codgi',
   // Your site's canonical URL (used for SEO / RSS later).
-  link: 'https://example.com',
+  link: 'https://notion-blog-wheat-mu.vercel.app',
   // Posts per page on the index.
   postsPerPage: 10,
   // ISR revalidation window in seconds.
