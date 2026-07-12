@@ -27,7 +27,7 @@ module.exports = {
   articlePrefix: 'article',
 
   // Home-page hero headline (two lines) and the "EST. <year>" founding year.
-  hero: { line1: 'Thoughts,', line2: 'crafted.' },
+  hero: { line1: '玩心即师', line2: 'In play, mastery.' },
   since: 2024,
 
   // Map logical fields -> your Notion property names.
