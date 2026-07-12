@@ -1124,6 +1124,51 @@ pre code {
   margin-top: 6px;
 }
 
+/* Mermaid diagrams — rendered client-side from a Notion code block whose
+   language is "mermaid", whose caption is exactly "mermaid", or whose plain-
+   text body starts with a diagram keyword (see lib/mermaid.ts). */
+.mermaid-block {
+  margin: 1.2em 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  overflow-x: auto;
+  text-align: center;
+}
+.mermaid-block figcaption {
+  color: var(--desc-color);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.mermaid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+.mermaid-error {
+  color: #cf222e;
+  font-size: 13px;
+  margin: 0 0 8px;
+  text-align: left;
+  white-space: pre-wrap;
+}
+.mermaid-source {
+  margin: 0;
+  text-align: left;
+  font-size: 12px;
+  opacity: 0.65;
+  white-space: pre-wrap;
+}
+html[data-theme='dark'] .mermaid-error {
+  color: #ff7b72;
+}
+
 /* highlight.js token theme — on-brand, flips with the site theme.
    Code injected at build time carries .hljs-* class names. */
 .hljs {

@@ -3,6 +3,8 @@ import Image from 'next/image';
 import type { BlockWithChildren } from '../lib/types';
 import { buildToc, type Toc } from '../lib/toc';
 import { RichText } from './RichText';
+import { Mermaid } from './Mermaid';
+import { isMermaid } from '../lib/mermaid';
 
 // ---------------------------------------------------------------------------
 // Heading anchors + table of contents.
@@ -190,8 +192,18 @@ export function NotionBlock({ block }: { block: BlockWithChildren }) {
       );
 
     case 'code': {
-      const caption = block.code.caption?.map((c) => c.plain_text).join('');
+      const caption = block.code.caption?.map((c) => c.plain_text).join('') ?? '';
       const raw = block.code.rich_text.map((t) => t.plain_text).join('');
+      if (isMermaid(block.code.language, caption, raw)) {
+        // A caption of exactly "mermaid" is just the render trigger, not a title.
+        const title = caption.trim().toLowerCase() === 'mermaid' ? '' : caption;
+        return (
+          <figure className="mermaid-block">
+            <Mermaid code={raw} />
+            {title && <figcaption>{title}</figcaption>}
+          </figure>
+        );
+      }
       return (
         <figure className="code-block">
           <pre className={`hljs language-${block.code.language}`}>

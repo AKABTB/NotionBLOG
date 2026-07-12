@@ -8,6 +8,7 @@
 import hljs from 'highlight.js';
 import katex from 'katex';
 import type { BlockWithChildren } from './types';
+import { isMermaid } from './mermaid';
 
 function escapeHtml(s: string): string {
   return s
@@ -65,7 +66,12 @@ export function enrichBlocks(blocks: BlockWithChildren[]): BlockWithChildren[] {
   for (const b of blocks) {
     if (b.type === 'code') {
       const code = b.code.rich_text.map((t) => t.plain_text).join('');
-      b.__codeHtml = highlight(code, b.code.language);
+      const caption = b.code.caption?.map((c) => c.plain_text).join('') ?? '';
+      // Mermaid blocks render to SVG in the browser; skip highlight.js so no
+      // escaped source rides along in props (the client uses raw text instead).
+      if (!isMermaid(b.code.language, caption, code)) {
+        b.__codeHtml = highlight(code, b.code.language);
+      }
     } else if (b.type === 'equation') {
       b.__eqHtml = katexHtml(b.equation.expression, true);
     }
