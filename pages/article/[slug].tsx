@@ -68,8 +68,32 @@ export default function ArticlePage({
   next,
   readingMinutes,
 }: ArticleProps) {
+  const base = (site.link || blogConfig.link).replace(/\/$/, '');
+  const canonical = `${base}/${blogConfig.articlePrefix}/${post.slug}`;
+  const ogImage = post.cover || undefined;
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.summary,
+    ...(ogImage ? { image: ogImage } : {}),
+    ...(post.date ? { datePublished: post.date, dateModified: post.date } : {}),
+    author: { '@type': 'Person', name: site.author || blogConfig.author },
+    publisher: { '@type': 'Organization', name: site.title || blogConfig.title },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  };
   return (
-    <Layout title={post.title} description={post.summary} menus={menus} notices={notices} site={site}>
+    <Layout
+      title={post.title}
+      description={post.summary}
+      menus={menus}
+      notices={notices}
+      site={site}
+      ogType="article"
+      ogImage={ogImage}
+      canonical={canonical}
+      jsonLd={jsonLd}
+    >
       <ReadingProgress />
       <div className="article-shell">
         <aside className="article-toc-col">

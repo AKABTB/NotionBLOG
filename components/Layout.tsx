@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import blogConfig from '../blog.config';
 import { useTheme } from '../lib/useTheme';
 import { SearchOverlay } from './SearchOverlay';
@@ -16,6 +17,10 @@ interface LayoutProps {
   site?: SiteConfig;
   // Posts made searchable via the Cmd/Ctrl+K palette (home page passes these).
   searchPosts?: Post[];
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  canonical?: string;
+  jsonLd?: Record<string, unknown>;
 }
 
 function NavLink({ item }: { item: MenuItem }) {
@@ -55,6 +60,10 @@ export function Layout({
   notices = [],
   site,
   searchPosts = [],
+  ogType = 'website',
+  ogImage,
+  canonical,
+  jsonLd,
 }: LayoutProps) {
   const siteTitle = site?.title ?? blogConfig.title;
   const siteDesc = site?.description ?? blogConfig.description;
@@ -62,6 +71,14 @@ export function Layout({
 
   const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
   const desc = description ?? siteDesc;
+
+  // Canonical / og:url: an explicit override (article pages know their exact
+  // URL from the slug) wins; otherwise derive from the configured base + the
+  // current path (query and hash stripped).
+  const router = useRouter();
+  const base = (site?.link ?? blogConfig.link).replace(/\/$/, '');
+  const path = (router.asPath ?? '').split('?')[0].split('#')[0] || '/';
+  const canonicalUrl = canonical ?? `${base}${path}`;
 
   // "Kiwi." style wordmark: first word of the site title with a trailing dot.
   const brand = siteTitle.split(/\s+/)[0] || siteTitle;
@@ -110,11 +127,26 @@ export function Layout({
         <title>{pageTitle}</title>
         <meta name="description" content={desc} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content={ogType} />
+        <meta property="og:site_name" content={siteTitle} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={desc} />
+        <meta property="og:url" content={canonicalUrl} />
+        {ogImage && <meta property="og:image" content={ogImage} />}
+        <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={desc} />
+        {ogImage && <meta name="twitter:image" content={ogImage} />}
         {site?.keywords && <meta name="keywords" content={site.keywords} />}
         {site?.favicon && <link rel="icon" href={site.favicon} />}
         {site?.globalCss && <style dangerouslySetInnerHTML={{ __html: site.globalCss }} />}
+        {jsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+        )}
       </Head>
 
       <nav className="site-nav-bar" ref={navRef}>
